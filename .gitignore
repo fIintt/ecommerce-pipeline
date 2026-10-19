@@ -8,3 +8,14 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Data files
+data/raw/*
+data/processed/*
+
+# Keep directory placeholders
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Environment variables
+.env
