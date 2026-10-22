@@ -20,16 +20,14 @@ def run_pipeline(path: str) -> None:
         raw = extract_transactions(path)
         validated = validate_transactions(raw)
         transformed = transform_transactions(validated)
-        loaded = load_transactions(transformed.head(10))
-
-        skipped = len(transformed) - loaded
+        loaded = load_transactions(transformed)
 
         logger.info(
-            f"Pipeline finished: received={len(transformed)} inserted={loaded} skipped={skipped}"
+            f"Pipeline finished: received={len(transformed)} inserted={loaded}"
         )
 
     except KeyError, ValueError, TypeError:
-        logger.exception("Weather data validation failed")
+        logger.exception("Transaction pipeline failed")
         raise
 
     except psycopg.OperationalError:
