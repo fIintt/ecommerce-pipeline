@@ -1,21 +1,32 @@
+from contextlib import contextmanager
+from pathlib import Path
+import shutil
+import tempfile
+from typing import Generator
+
 import polars as pl
 
 
-def extract_transactions(path: str) -> pl.DataFrame:
-    return (
-        pl.scan_csv(path, infer_schema=False)
-        .rename(lambda name: name.strip())
-        .cast(
-            {
-                "InvoiceNo": pl.String,
-                "StockCode": pl.String,
-                "Description": pl.String,
-                "Quantity": pl.Int32,
-                "InvoiceDate": pl.String,
-                "UnitPrice": pl.Float32,
-                "CustomerID": pl.String,
-                "Country": pl.String,
-            }
+@contextmanager
+def extract_transactions(
+    path: Path, chunk_size: int = 1 << 20
+) -> Generator[pl.LazyFrame]:
+    with tempfile.TemporaryDirectory(prefix="transactions_") as tmp:
+        utf8_path = Path(tmp) / f"{path.stem}_utf8.csv"
+
+        with (
+            open(path, "r", encoding="cp1252", newline="") as file_in,
+            open(utf8_path, "w", encoding="utf-8", newline="") as file_out,
+        ):
+            shutil.copyfileobj(file_in, file_out, chunk_size)
+
+        yield (
+            pl.scan_csv(utf8_path, infer_schema=False)
+            .rename(lambda name: name.strip())
+            .cast(
+                {
+                    "Quantity": pl.Int32,
+                    "UnitPrice": pl.Float64,
+                }
+            )
         )
-        .collect()
-    )

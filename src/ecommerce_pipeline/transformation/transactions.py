@@ -12,7 +12,7 @@ COLUMN_MAPPING = {
 }
 
 
-def transform_transactions(df: pl.DataFrame) -> pl.DataFrame:
-    return df.rename(COLUMN_MAPPING).with_columns(
+def transform_transactions(lf: pl.LazyFrame) -> pl.LazyFrame:
+    return lf.rename(COLUMN_MAPPING).with_columns(
         pl.col("invoice_date").str.to_datetime("%m/%d/%Y %H:%M"),
     )

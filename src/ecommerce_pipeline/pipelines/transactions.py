@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 import time
 
 import psycopg
@@ -11,23 +12,24 @@ from ecommerce_pipeline.validation.transactions import validate_transactions
 logger = logging.getLogger(__name__)
 
 
-def run_pipeline(path: str) -> None:
+def run_pipeline(path: Path) -> None:
     started_at = time.perf_counter()
 
-    logger.info("Transaction pipeline started")
+    logger.info("Transactions pipeline started")
 
     try:
-        raw = extract_transactions(path)
-        validated = validate_transactions(raw)
-        transformed = transform_transactions(validated)
+        with extract_transactions(path) as raw:
+            validated = validate_transactions(raw)
+            transformed = transform_transactions(validated).collect()
         loaded = load_transactions(transformed)
 
-        logger.info(
-            f"Pipeline finished: received={len(transformed)} inserted={loaded}"
-        )
+        if transformed.height == loaded:
+            logger.info(f"received={transformed.height} inserted={loaded}")
+        else:
+            logger.warning(f"Mismatch: received={transformed.height} inserted={loaded}")
 
     except KeyError, ValueError, TypeError:
-        logger.exception("Transaction pipeline failed")
+        logger.exception("Transactions pipeline failed")
         raise
 
     except psycopg.OperationalError:
@@ -43,7 +45,7 @@ def run_pipeline(path: str) -> None:
         raise
 
     else:
-        logger.info("Transaction pipeline succeeded.")
+        logger.info("Transactions pipeline succeeded.")
 
     finally:
         elapsed = time.perf_counter() - started_at
