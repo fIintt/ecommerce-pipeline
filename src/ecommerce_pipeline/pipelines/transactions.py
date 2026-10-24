@@ -24,9 +24,11 @@ def run_pipeline(path: Path) -> None:
         loaded = load_transactions(transformed)
 
         if transformed.height == loaded:
-            logger.info(f"received={transformed.height} inserted={loaded}")
+            logger.info("received=%d inserted=%d", transformed.height, loaded)
         else:
-            logger.warning(f"Mismatch: received={transformed.height} inserted={loaded}")
+            logger.warning(
+                "Mismatch: received=%d inserted=%d", transformed.height, loaded
+            )
 
     except KeyError, ValueError, TypeError:
         logger.exception("Transactions pipeline failed")
@@ -49,4 +51,4 @@ def run_pipeline(path: Path) -> None:
 
     finally:
         elapsed = time.perf_counter() - started_at
-        logger.info(f"Elapsed - {elapsed:.2f} seconds")
+        logger.info("Elapsed - %.2f seconds", elapsed)
