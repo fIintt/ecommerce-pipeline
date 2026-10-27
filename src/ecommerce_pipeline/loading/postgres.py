@@ -11,16 +11,40 @@ def connect_postgres() -> psycopg.Connection:
 
 
 def load_transactions(rows: pl.DataFrame) -> int:
-    records = rows.select(["description", "quantity", "unit_price"]).iter_rows()
+    records = rows.select(
+        [
+            "source_file_hash",
+            "source_row_number",
+            "invoice_no",
+            "stock_code",
+            "description",
+            "quantity",
+            "invoice_date",
+            "unit_price",
+            "customer_id",
+            "country",
+        ]
+    ).iter_rows()
 
     with connect_postgres() as conn:
         with conn.cursor() as cursor:
             cursor.executemany(
                 """
-                INSERT INTO transactions
-                    (description, quantity, unit_price)
-                VALUES 
-                    (%s, %s, %s)
+                INSERT INTO transactions (
+                    source_file_hash,
+                    source_row_number,
+                    invoice_no,
+                    stock_code,
+                    description,
+                    quantity,
+                    invoice_date,
+                    unit_price,
+                    customer_id,
+                    country
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT ON CONSTRAINT uq_transactions_source_record
+                DO NOTHING
                 """,
                 records,
             )

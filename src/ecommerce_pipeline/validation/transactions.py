@@ -18,8 +18,6 @@ def validate_transactions(lf: pl.LazyFrame) -> pl.LazyFrame:
     if missing_columns:
         raise ValueError(f"Missing required columns: {missing_columns}")
 
-    print(lf.filter(pl.col("UnitPrice").round(2) != pl.col("UnitPrice")))
-
     validated = lf.filter(
         pl.col("InvoiceNo").is_not_null()
         & (pl.col("InvoiceNo").str.strip_chars() != "")
@@ -32,6 +30,6 @@ def validate_transactions(lf: pl.LazyFrame) -> pl.LazyFrame:
         & (pl.col("UnitPrice") >= 0)
         & pl.col("Country").is_not_null()
         & (pl.col("Country").str.strip_chars() != "")
-    ).unique()
+    )
 
     return validated
