@@ -13,11 +13,13 @@ wheels/
 data/bronze/*
 data/silver/*
 data/gold/*
+data/rejected/*
 
 # Keep directory placeholders
 !data/bronze/.gitkeep
 !data/silver/.gitkeep
 !data/gold/.gitkeep
+!data/rejected/.gitkeep
 
 # Environment variables
 .env

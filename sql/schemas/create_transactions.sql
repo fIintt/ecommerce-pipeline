@@ -1,4 +1,4 @@
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS transactions (
     id                  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     source_file_hash    TEXT NOT NULL,
     source_row_number   BIGINT NOT NULL,

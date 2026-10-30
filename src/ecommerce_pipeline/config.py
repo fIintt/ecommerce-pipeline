@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -22,3 +23,7 @@ DB_PASSWORD = require_env("DB_PASSWORD")
 DB_HOST = require_env("DB_HOST")
 DB_PORT = int(os.getenv("DB_PORT", "5432"))
 DB_NAME = require_env("DB_NAME")
+
+# Path
+RAW_TRANSACTIONS_PATH = Path("data/bronze/transactions.csv")
+REJECTED_TRANSACTIONS_PATH = Path("data/rejected")

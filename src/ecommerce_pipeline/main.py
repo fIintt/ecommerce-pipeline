@@ -1,15 +1,13 @@
 # 10/19/2026
 import argparse
 import logging
-import os
 from pathlib import Path
 
+from ecommerce_pipeline.config import RAW_TRANSACTIONS_PATH
 from ecommerce_pipeline.logging_config import setup_logging
 from ecommerce_pipeline.pipelines.transactions import run_pipeline
 
 logger = logging.getLogger(__name__)
-
-DEFAULT_PATH = Path("data/bronze/transactions.csv")
 
 
 def parse_args() -> argparse.Namespace:
@@ -17,7 +15,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--path",
         type=Path,
-        default=Path(os.getenv("TRANSACTIONS_PATH", DEFAULT_PATH)),
+        default=RAW_TRANSACTIONS_PATH,
         help="Path to the raw transactions CSV (default: %(default)s)",
     )
     return parser.parse_args()
