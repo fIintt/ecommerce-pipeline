@@ -21,14 +21,18 @@ def run_pipeline(path: Path) -> None:
         with extract_transactions(path) as raw:
             validated = validate_transactions(raw)
             transformed = transform_transactions(validated).collect()
+            
         loaded = load_transactions(transformed)
+        
+        received = transformed.height
+        skipped = received - loaded
 
-        if transformed.height == loaded:
-            logger.info("received=%d inserted=%d", transformed.height, loaded)
+        if loaded == received:
+            logger.info("received=%d loaded=%d", received, loaded)
+        elif loaded == 0:
+            logger.info("No new rows, already loaded", received)
         else:
-            logger.warning(
-                "Mismatch: received=%d inserted=%d", transformed.height, loaded
-            )
+            logger.info("received=%d loaded=%d skipped=%d", received, loaded, skipped)
 
     except KeyError, ValueError, TypeError:
         logger.exception("Transactions pipeline failed")
