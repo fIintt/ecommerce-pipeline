@@ -3,8 +3,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-load_dotenv()
+load_dotenv(PROJECT_ROOT / ".env")
 
 
 def require_env(name: str) -> str:
@@ -21,9 +22,14 @@ def require_env(name: str) -> str:
 DB_USER = require_env("DB_USER")
 DB_PASSWORD = require_env("DB_PASSWORD")
 DB_HOST = require_env("DB_HOST")
-DB_PORT = int(os.getenv("DB_PORT", "5432"))
+DB_PORT = int(require_env("DB_PORT"))
 DB_NAME = require_env("DB_NAME")
 
 # Path
-RAW_TRANSACTIONS_PATH = Path("data/bronze/transactions.csv")
-REJECTED_TRANSACTIONS_PATH = Path("data/rejected")
+BRONZE_DIR = PROJECT_ROOT / "data" / "bronze"
+REJECTED_DIR = PROJECT_ROOT / "data" / "rejected"
+SCHEMA_DIR = PROJECT_ROOT / "sql" / "schemas"
+
+BRONZE_TRANSACTION_PATH = BRONZE_DIR / "transactions.csv"
+
+REJECTED_TRANSACTION_PATH = REJECTED_DIR / "transactions"

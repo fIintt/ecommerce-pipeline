@@ -1,5 +1,33 @@
+from typing import LiteralString, cast
+
 import psycopg
 import polars as pl
+
+from ecommerce_pipeline.config import (
+    DB_HOST,
+    DB_NAME,
+    DB_PASSWORD,
+    DB_PORT,
+    DB_USER,
+    SCHEMA_DIR,
+)
+
+
+def connect_postgres() -> psycopg.Connection:
+    return psycopg.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        connect_timeout=10,
+        options="-c lock_timeout=10000",  # millisecond
+    )
+
+
+def create_schemas(conn: psycopg.Connection) -> None:
+    for file in sorted(SCHEMA_DIR.glob("*.sql")):
+        conn.execute(cast(LiteralString, file.read_text(encoding="utf-8")))
 
 
 def load_transactions(conn: psycopg.Connection, rows: pl.DataFrame) -> int:

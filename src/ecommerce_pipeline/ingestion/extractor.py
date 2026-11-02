@@ -1,4 +1,6 @@
 from contextlib import contextmanager
+from ctypes import cast
+import hashlib
 from pathlib import Path
 import shutil
 import tempfile
@@ -7,8 +9,18 @@ from typing import Generator
 import polars as pl
 
 
+def hash_file(path: Path, chunk_size: int = 1 << 20) -> str:
+    sha256 = hashlib.sha256()
+
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(chunk_size), b""):
+            sha256.update(chunk)
+
+    return sha256.hexdigest()
+
+
 @contextmanager
-def extract_transactions(
+def extract_csv(
     path: Path, source_file_hash: str, chunk_size: int = 1 << 20
 ) -> Generator[pl.LazyFrame]:
     with tempfile.TemporaryDirectory(prefix="transactions_") as tmp:
@@ -28,13 +40,8 @@ def extract_transactions(
                 row_index_offset=1,
             )
             .rename(lambda name: name.strip())
-            .with_columns(pl.lit(source_file_hash).alias("source_file_hash"))
-            .cast(
-                {
-                    "source_row_number": pl.Int64,
-                    "Quantity": pl.Int32,
-                    "UnitPrice": pl.Decimal(12, 4),
-                },
-                strict=False,
+            .with_columns(
+                pl.col("source_row_number").cast(pl.Int64),
+                pl.lit(source_file_hash).alias("source_file_hash"),
             )
         )
