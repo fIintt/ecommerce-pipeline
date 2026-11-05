@@ -6,6 +6,7 @@ from pathlib import Path
 import polars as pl
 import psycopg
 
+from ecommerce_pipeline.loading.postgres import load_loaded_files
 from ecommerce_pipeline.logging_config import PipelineLogs
 from ecommerce_pipeline.ingestion.extractor import extract_csv, hash_file
 from ecommerce_pipeline.loading.parquet import load_rejected_data
@@ -29,7 +30,7 @@ def run_pipeline(
     try:
         source_file_hash = hash_file(path)
 
-        with extract_csv(path, source_file_hash) as raw:
+        with extract_csv(path) as raw:
             valid_input, rejected_input = validate_input(raw)
             transformed = transform(valid_input)
             valid_output, rejected_output = validate_output(transformed)
@@ -60,13 +61,13 @@ def run_pipeline(
             )
 
         read = read_df.item()
-        duplicates_dropped = read - deduped_df.item()
+        duplicates = read - deduped_df.item()
         validated_count = valid_df.height
         rejected_count = rejected_df.height
 
-        if read != duplicates_dropped + rejected_count + validated_count:
+        if read != duplicates + rejected_count + validated_count:
             raise ValueError(
-                f"Counts do not add up: read={read} duplicates={duplicates_dropped} "
+                f"Counts do not add up: read={read} duplicates={duplicates} "
                 f"rejected={rejected_count} valid={validated_count}"
             )
 
@@ -80,14 +81,28 @@ def run_pipeline(
                 f"expected={rejected_count} loaded={loaded_rejected_count}"
             )
 
-        loaded = load(conn, valid_df)
+        with conn.transaction():
+            load_id = load_loaded_files(
+                conn, source_file_hash, path.name, validated_count
+            )
+
+            if load_id is None:
+                loaded = 0
+
+            else:
+                loaded = load(conn, valid_df)
+
+                if loaded != validated_count:
+                    raise ValueError(
+                        f"Load mismatch: expected={validated_count} loaded={loaded}"
+                    )
 
         skipped = validated_count - loaded
         elapsed = time.perf_counter() - started_at
 
         return {
             "read": read,
-            "duplicated": duplicates_dropped,
+            "duplicated": duplicates,
             "rejected": rejected_count,
             "skipped": skipped,
             "loaded": loaded,

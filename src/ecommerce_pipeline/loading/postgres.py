@@ -30,11 +30,25 @@ def create_schemas(conn: psycopg.Connection) -> None:
         conn.execute(cast(LiteralString, file.read_text(encoding="utf-8")))
 
 
+def load_loaded_files(
+    conn: psycopg.Connection, file_hash: str, file_name: str, row_count: int
+) -> int | None:
+    row = conn.execute(
+        """
+        INSERT INTO loaded_files (file_hash, file_name, row_count)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (file_hash) DO NOTHING
+        RETURNING id
+        """,
+        (file_hash, file_name, row_count)
+    ).fetchone()
+
+    return row[0] if row else None
+
+
 def load_transactions(conn: psycopg.Connection, rows: pl.DataFrame) -> int:
     records = rows.select(
         [
-            "source_file_hash",
-            "source_row_number",
             "invoice_no",
             "stock_code",
             "description",
@@ -47,25 +61,14 @@ def load_transactions(conn: psycopg.Connection, rows: pl.DataFrame) -> int:
     ).iter_rows()
 
     with conn.cursor() as cursor:
-        cursor.executemany(
+        with cursor.copy(
             """
-            INSERT INTO transactions (
-                source_file_hash,
-                source_row_number,
-                invoice_no,
-                stock_code,
-                description,
-                quantity,
-                invoice_date,
-                unit_price,
-                customer_id,
-                country
-            )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT ON CONSTRAINT uq_transactions_source_record
-            DO NOTHING
-            """,
-            records,
-        )
+            COPY transactions 
+                (invoice_no, stock_code, description, quantity, invoice_date, unit_price, customer_id, country) 
+            FROM STDIN
+            """
+            ) as copy:
+            for record in records:
+                copy.write_row(record)
 
         return cursor.rowcount

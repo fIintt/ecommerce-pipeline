@@ -1,5 +1,4 @@
 from contextlib import contextmanager
-from ctypes import cast
 import hashlib
 from pathlib import Path
 import shutil
@@ -20,9 +19,7 @@ def hash_file(path: Path, chunk_size: int = 1 << 20) -> str:
 
 
 @contextmanager
-def extract_csv(
-    path: Path, source_file_hash: str, chunk_size: int = 1 << 20
-) -> Generator[pl.LazyFrame]:
+def extract_csv(path: Path, chunk_size: int = 1 << 20) -> Generator[pl.LazyFrame]:
     with tempfile.TemporaryDirectory(prefix="transactions_") as tmp:
         utf8_path = Path(tmp) / f"{path.stem}_utf8.csv"
 
@@ -36,12 +33,8 @@ def extract_csv(
             pl.scan_csv(
                 utf8_path,
                 infer_schema=False,
-                row_index_name="source_row_number",
-                row_index_offset=1,
             )
             .rename(lambda name: name.strip())
-            .with_columns(
-                pl.col("source_row_number").cast(pl.Int64),
-                pl.lit(source_file_hash).alias("source_file_hash"),
-            )
+            .with_row_index("source_row_number", offset=1)
+            .with_columns(pl.col("source_row_number").cast(pl.Int64))
         )
