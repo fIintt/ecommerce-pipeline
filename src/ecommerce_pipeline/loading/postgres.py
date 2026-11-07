@@ -1,7 +1,9 @@
+from pathlib import Path
 from typing import LiteralString, cast
 
 import psycopg
 import polars as pl
+from psycopg import sql
 
 from ecommerce_pipeline.config import (
     DB_HOST,
@@ -9,8 +11,6 @@ from ecommerce_pipeline.config import (
     DB_PASSWORD,
     DB_PORT,
     DB_USER,
-    SCHEMA_DIR,
-    VIEW_DIR,
 )
 
 
@@ -26,13 +26,8 @@ def connect_postgres() -> psycopg.Connection:
     )
 
 
-def create_schemas(conn: psycopg.Connection) -> None:
-    for file in sorted(SCHEMA_DIR.glob("*.sql")):
-        conn.execute(cast(LiteralString, file.read_text(encoding="utf-8")))
-
-
-def create_views(conn: psycopg.Connection) -> None:
-    for file in sorted(VIEW_DIR.glob("*.sql")):
+def initialize_postgres(conn: psycopg.Connection, path: Path) -> None:
+    for file in sorted(path.glob("*.sql")):
         conn.execute(cast(LiteralString, file.read_text(encoding="utf-8")))
 
 
@@ -53,26 +48,24 @@ def load_loaded_files(
 
 
 def load_transactions(conn: psycopg.Connection, rows: pl.DataFrame) -> int:
-    records = rows.select(
-        [
-            "invoice_no",
-            "stock_code",
-            "description",
-            "quantity",
-            "invoice_date",
-            "unit_price",
-            "customer_id",
-            "country",
-        ]
-    ).iter_rows()
+    COLUMNS = [
+        "invoice_no",
+        "stock_code",
+        "description",
+        "quantity",
+        "invoice_date",
+        "unit_price",
+        "customer_id",
+        "country",
+    ]
+
+    query = sql.SQL("COPY transactions ({columns}) FROM STDIN").format(
+        columns=sql.SQL(", ").join(sql.Identifier(c) for c in COLUMNS)
+    )
 
     with conn.cursor() as cursor:
-        with cursor.copy("""
-            COPY transactions 
-                (invoice_no, stock_code, description, quantity, invoice_date, unit_price, customer_id, country) 
-            FROM STDIN
-            """) as copy:
-            for record in records:
+        with cursor.copy(query) as copy:
+            for record in rows.select(COLUMNS).iter_rows():
                 copy.write_row(record)
 
         return cursor.rowcount
