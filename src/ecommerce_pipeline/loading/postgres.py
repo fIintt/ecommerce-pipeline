@@ -10,6 +10,7 @@ from ecommerce_pipeline.config import (
     DB_PORT,
     DB_USER,
     SCHEMA_DIR,
+    VIEW_DIR,
 )
 
 
@@ -30,6 +31,11 @@ def create_schemas(conn: psycopg.Connection) -> None:
         conn.execute(cast(LiteralString, file.read_text(encoding="utf-8")))
 
 
+def create_views(conn: psycopg.Connection) -> None:
+    for file in sorted(VIEW_DIR.glob("*.sql")):
+        conn.execute(cast(LiteralString, file.read_text(encoding="utf-8")))
+
+
 def load_loaded_files(
     conn: psycopg.Connection, file_hash: str, file_name: str, row_count: int
 ) -> int | None:
@@ -40,7 +46,7 @@ def load_loaded_files(
         ON CONFLICT (file_hash) DO NOTHING
         RETURNING id
         """,
-        (file_hash, file_name, row_count)
+        (file_hash, file_name, row_count),
     ).fetchone()
 
     return row[0] if row else None
@@ -61,13 +67,11 @@ def load_transactions(conn: psycopg.Connection, rows: pl.DataFrame) -> int:
     ).iter_rows()
 
     with conn.cursor() as cursor:
-        with cursor.copy(
-            """
+        with cursor.copy("""
             COPY transactions 
                 (invoice_no, stock_code, description, quantity, invoice_date, unit_price, customer_id, country) 
             FROM STDIN
-            """
-            ) as copy:
+            """) as copy:
             for record in records:
                 copy.write_row(record)
 

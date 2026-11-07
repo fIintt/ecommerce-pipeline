@@ -29,6 +29,7 @@ DB_NAME = require_env("DB_NAME")
 BRONZE_DIR = PROJECT_ROOT / "data" / "bronze"
 REJECTED_DIR = PROJECT_ROOT / "data" / "rejected"
 SCHEMA_DIR = PROJECT_ROOT / "sql" / "schemas"
+VIEW_DIR = PROJECT_ROOT / "sql" / "views"
 
 BRONZE_TRANSACTION_PATH = BRONZE_DIR / "transactions.csv"
 

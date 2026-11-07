@@ -1,7 +1,7 @@
 # 10/19/2026
 import logging
 
-from ecommerce_pipeline.loading.postgres import connect_postgres, create_schemas
+from ecommerce_pipeline.loading.postgres import connect_postgres, create_schemas, create_views
 from ecommerce_pipeline.logging_config import log_summary, setup_logging
 from ecommerce_pipeline.pipelines.transactions import run_transaction_pipeline
 
@@ -17,6 +17,7 @@ def main() -> None:
 
     with connect_postgres() as conn:
         create_schemas(conn)
+        create_views(conn)
 
         summary["transactions"] = run_transaction_pipeline(conn)
 
