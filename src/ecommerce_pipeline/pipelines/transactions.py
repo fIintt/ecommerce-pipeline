@@ -21,7 +21,7 @@ def run_transaction_pipeline(
     conn: psycopg.Connection, path: Path = BRONZE_TRANSACTION_PATH
 ) -> PipelineLogs:
     return run_pipeline(
-        name="students",
+        name="transactions",
         conn=conn,
         path=path,
         rejected_path=REJECTED_TRANSACTION_PATH,

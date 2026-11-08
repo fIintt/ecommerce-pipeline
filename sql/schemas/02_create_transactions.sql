@@ -3,9 +3,9 @@ CREATE TABLE IF NOT EXISTS transactions (
     invoice_no          TEXT NOT NULL,
     stock_code          TEXT NOT NULL,
     description         TEXT,
-    quantity            INT NOT NULL,
+    quantity            INT NOT NULL CHECK (quantity <> 0),
     invoice_date        TIMESTAMP NOT NULL,
-    unit_price          NUMERIC(12,4) NOT NULL,
+    unit_price          NUMERIC(12,4) NOT NULL CHECK (unit_price >= 0),
     customer_id         BIGINT,
     country             TEXT
 );
