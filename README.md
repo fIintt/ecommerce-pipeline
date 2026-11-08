@@ -57,3 +57,6 @@ Index sizes come from `SELECT pg_size_pretty(pg_relation_size('index_name'));`.
 ### Takeaway
 
 Indexes help queries that select a small part of the table (Q1, Q2, Q4) and do nothing for queries that scan everything (Q5). Each index costs disk space and write speed, so I only kept the ones tied to a measured improvement.
+
+Records with negative quantities and "C" in invoice_no are cancellations
+Records with negative quantities and without "C" in invoice_no are damaged/lost/unsure,...

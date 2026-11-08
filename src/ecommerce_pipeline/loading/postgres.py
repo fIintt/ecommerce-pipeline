@@ -32,9 +32,13 @@ def load_loaded_files(
 ) -> int | None:
     row = conn.execute(
         """
-        INSERT INTO loaded_files (file_hash, file_name, row_count)
-        VALUES (%s, %s, %s)
-        ON CONFLICT (file_hash) DO NOTHING
+        INSERT INTO loaded_files
+            (file_hash, file_name, row_count)
+        VALUES
+            (%s, %s, %s)
+        ON CONFLICT
+            (file_hash)
+        DO NOTHING
         RETURNING id
         """,
         (file_hash, file_name, row_count),

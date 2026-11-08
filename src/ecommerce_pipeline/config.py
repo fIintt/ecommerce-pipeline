@@ -10,6 +10,7 @@ BRONZE_DIR = PROJECT_ROOT / "data" / "bronze"
 REJECTED_DIR = PROJECT_ROOT / "data" / "rejected"
 SCHEMA_DIR = PROJECT_ROOT / "sql" / "schemas"
 VIEW_DIR = PROJECT_ROOT / "sql" / "views"
+ANALYTICS_DIR = PROJECT_ROOT / "sql" / "analytics"
 
 BRONZE_TRANSACTION_PATH = BRONZE_DIR / "transactions.csv"
 
