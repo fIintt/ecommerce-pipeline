@@ -23,9 +23,10 @@ _TRANSACTION_INPUT_RULES: dict[str, pl.Expr] = {
 }
 
 _TRANSACTION_OUTPUT_RULES: dict[str, pl.Expr] = {
-    "invalid_unit_price": pl.col("unit_price") < 0,
+    "negative_unit_price": pl.col("unit_price") < 0,
     "missing_unit_price": pl.col("unit_price").is_null(), # Todo: differentiate the original data has a missing price or an invalid price that failed conversion
     "missing_quantity": pl.col("quantity").is_null(),
+    "zero_quantity": pl.col("quantity") == 0,
     "missing_invoice_date": pl.col("invoice_date").is_null(),
 }
 

@@ -5,22 +5,18 @@ import psycopg
 import polars as pl
 from psycopg import sql
 
-from ecommerce_pipeline.config import (
-    DB_HOST,
-    DB_NAME,
-    DB_PASSWORD,
-    DB_PORT,
-    DB_USER,
-)
+from ecommerce_pipeline.config import setup_database_settings
 
 
 def connect_postgres() -> psycopg.Connection:
+    settings = setup_database_settings()
+
     return psycopg.connect(
-        host=DB_HOST,
-        port=DB_PORT,
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
+        host=settings.host,
+        port=settings.port,
+        dbname=settings.name,
+        user=settings.user,
+        password=settings.password,
         connect_timeout=10,
         options="-c lock_timeout=10000",  # millisecond
     )

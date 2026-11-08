@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import os
 from pathlib import Path
 
@@ -5,7 +6,23 @@ from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-load_dotenv(PROJECT_ROOT / ".env")
+BRONZE_DIR = PROJECT_ROOT / "data" / "bronze"
+REJECTED_DIR = PROJECT_ROOT / "data" / "rejected"
+SCHEMA_DIR = PROJECT_ROOT / "sql" / "schemas"
+VIEW_DIR = PROJECT_ROOT / "sql" / "views"
+
+BRONZE_TRANSACTION_PATH = BRONZE_DIR / "transactions.csv"
+
+REJECTED_TRANSACTION_PATH = REJECTED_DIR / "transactions"
+
+
+@dataclass(frozen=True)
+class DatabaseSettings:
+    user: str
+    password: str
+    host: str
+    port: int
+    name: str
 
 
 def require_env(name: str) -> str:
@@ -18,19 +35,13 @@ def require_env(name: str) -> str:
     return value
 
 
-# Database
-DB_USER = require_env("DB_USER")
-DB_PASSWORD = require_env("DB_PASSWORD")
-DB_HOST = require_env("DB_HOST")
-DB_PORT = int(require_env("DB_PORT"))
-DB_NAME = require_env("DB_NAME")
+def setup_database_settings() -> DatabaseSettings:
+    load_dotenv(PROJECT_ROOT / ".env")
 
-# Path
-BRONZE_DIR = PROJECT_ROOT / "data" / "bronze"
-REJECTED_DIR = PROJECT_ROOT / "data" / "rejected"
-SCHEMA_DIR = PROJECT_ROOT / "sql" / "schemas"
-VIEW_DIR = PROJECT_ROOT / "sql" / "views"
-
-BRONZE_TRANSACTION_PATH = BRONZE_DIR / "transactions.csv"
-
-REJECTED_TRANSACTION_PATH = REJECTED_DIR / "transactions"
+    return DatabaseSettings(
+        user=require_env("DB_USER"),
+        password=require_env("DB_PASSWORD"),
+        host=require_env("DB_HOST"),
+        port=int(require_env("DB_PORT")),
+        name=require_env("DB_NAME"),
+    )
