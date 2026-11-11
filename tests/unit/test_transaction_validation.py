@@ -95,8 +95,8 @@ def test_output_valid_row_passes():
 @pytest.mark.parametrize(
     "samples",
     [
-        pytest.param({"unit_price": -69.67}, id="invalid_unit_price"),
-        pytest.param({"quantity": 0}, id="missing_quantity"),
+        pytest.param({"unit_price": -69.67}, id="negative_unit_price"),
+        pytest.param({"quantity": 0}, id="zero_quantity"),
         pytest.param({"unit_price": None}, id="missing_unit_price"),
     ],
 )

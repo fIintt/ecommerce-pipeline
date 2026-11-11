@@ -7,14 +7,13 @@ from dotenv import load_dotenv
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 BRONZE_DIR = PROJECT_ROOT / "data" / "bronze"
+SILVER_DIR = PROJECT_ROOT / "data" / "silver"
+GOLD_DIR = PROJECT_ROOT / "data" / "gold"
 REJECTED_DIR = PROJECT_ROOT / "data" / "rejected"
+
 SCHEMA_DIR = PROJECT_ROOT / "sql" / "schemas"
 VIEW_DIR = PROJECT_ROOT / "sql" / "views"
 ANALYTICS_DIR = PROJECT_ROOT / "sql" / "analytics"
-
-BRONZE_TRANSACTION_PATH = BRONZE_DIR / "transactions.csv"
-
-REJECTED_TRANSACTION_PATH = REJECTED_DIR / "transactions"
 
 
 @dataclass(frozen=True)

@@ -75,6 +75,6 @@ def test_non_numeric_quantity_becomes_null():
 
 
 def test_row_count_is_unchanged():
-    df = run(make_input_lf({}, {"UnitPrice": -67.76}, {"Description": None}))
+    df = run(make_input_lf({}, {"UnitPrice": "-67.76"}, {"Description": None}))
 
     assert df.height == 3

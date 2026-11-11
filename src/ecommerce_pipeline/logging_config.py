@@ -1,19 +1,12 @@
 import logging
-from typing import TypedDict, get_type_hints
+from typing import get_type_hints
 
 from rich import box
 from rich.logging import RichHandler
 from rich.table import Table
 from rich.console import Console
 
-
-class PipelineLogs(TypedDict):
-    read: int
-    duplicated: int
-    rejected: int
-    skipped: int
-    loaded: int
-    elapsed: float
+from ecommerce_pipeline.pipelines.runner import PipelineResult
 
 
 def setup_logging() -> None:
@@ -25,23 +18,22 @@ def setup_logging() -> None:
     )
 
 
-def log_summary(results: dict[str, PipelineLogs]) -> None:
+def log_summary(results: dict[str, PipelineResult]) -> None:
     table = Table(title="Summary", title_style="bold", box=box.MINIMAL, expand=True)
 
     table.add_column("pipeline")
 
-    for col in list(get_type_hints(PipelineLogs)):
+    for col in list(get_type_hints(PipelineResult)):
         table.add_column(col, justify="right")
 
-    for name, r in results.items():
+    for name, result in results.items():
         table.add_row(
             name,
-            str(r["read"]),
-            str(r["duplicated"]),
-            f"[red]{r['rejected']}[/red]" if r["rejected"] else "0",
-            str(r["skipped"]),
-            f"[green]{r['loaded']}[/green]",
-            f"{r['elapsed']:.2f}s",
+            str(result.read),
+            f"[red]{result.rejected}[/red]" if result.rejected else "0",
+            f"[yellow]{result.skipped}[/yellow]" if result.skipped else "0",
+            f"[green]{result.loaded}[/green]" if result.loaded else "0",
+            f"{result.elapsed:.2f}s",
         )
 
     Console().print(table)
