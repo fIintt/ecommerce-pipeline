@@ -41,15 +41,15 @@ def _process_batch(
     valid_output, rejected_output = validate_output(transformed)
 
     rejected_output = raw.join(
-        rejected_output.select("source_row_number", "reject_reason"),
-        on="source_row_number",
+        rejected_output.select("_source_row_number", "_reject_reason"),
+        on="_source_row_number",
         how="inner",
     )
 
     rejected = pl.concat(
         [
-            rejected_input.with_columns(pl.lit("input").alias("reject_stage")),
-            rejected_output.with_columns(pl.lit("output").alias("reject_stage")),
+            rejected_input.with_columns(pl.lit("input").alias("_reject_stage")),
+            rejected_output.with_columns(pl.lit("output").alias("_reject_stage")),
         ],
         how="diagonal",
     )
@@ -130,11 +130,15 @@ def run_pipeline(
                 loaded = 0
 
             else:
-                loaded = load(conn, batch.valid)
+                loadable = batch.valid.with_columns(
+                    pl.lit(load_id).alias("_loaded_file_id")
+                )
 
-                if loaded != batch.valid.height:
+                loaded = load(conn, loadable)
+
+                if loaded != loadable.height:
                     raise ValueError(
-                        f"Load mismatch: expected={batch.valid.height} loaded={loaded}"
+                        f"Load mismatch: expected={loadable.height} loaded={loaded}"
                     )
 
         elapsed = time.perf_counter() - started_at

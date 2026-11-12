@@ -16,11 +16,11 @@ def _apply_rules(
             ],
             separator=";",
             ignore_nulls=True,
-        ).alias("reject_reason")
+        ).alias("_reject_reason")
     )
 
-    valid = flagged.filter(pl.col("reject_reason") == "").drop("reject_reason")
-    rejected = flagged.filter(pl.col("reject_reason") != "")
+    valid = flagged.filter(pl.col("_reject_reason") == "").drop("_reject_reason")
+    rejected = flagged.filter(pl.col("_reject_reason") != "")
 
     return valid, rejected
 

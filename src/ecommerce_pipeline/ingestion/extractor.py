@@ -35,6 +35,6 @@ def extract_csv(path: Path, chunk_size: int = 1 << 20) -> Generator[pl.LazyFrame
                 infer_schema=False,
             )
             .rename(lambda name: name.strip())
-            .with_row_index("source_row_number", offset=1)
-            .with_columns(pl.col("source_row_number").cast(pl.Int64))
+            .with_row_index("_source_row_number", offset=1)
+            .with_columns(pl.col("_source_row_number").cast(pl.Int64))
         )

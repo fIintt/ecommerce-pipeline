@@ -57,10 +57,12 @@ def load_transactions(conn: psycopg.Connection, rows: pl.DataFrame) -> int:
         "unit_price",
         "customer_id",
         "country",
+        "_loaded_file_id",
+        "_source_row_number",
     ]
 
     query = sql.SQL("COPY transactions ({columns}) FROM STDIN").format(
-        columns=sql.SQL(", ").join(sql.Identifier(c) for c in COLUMNS)
+        columns=sql.SQL(", ").join(sql.Identifier(col) for col in COLUMNS)
     )
 
     with conn.cursor() as cursor:
