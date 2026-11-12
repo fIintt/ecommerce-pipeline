@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS transactions (
     unit_price          NUMERIC(12,4) NOT NULL CHECK (unit_price >= 0),
     customer_id         BIGINT,
     country             TEXT,
-    _loaded_file_id      BIGINT NOT NULL REFERENCES loaded_files(id) ON DELETE RESTRICT,
-    _source_row_number   BIGINT NOT NULL,
+    _loaded_file_id     INT NOT NULL REFERENCES loaded_files(id) ON DELETE RESTRICT,
+    _source_row_number  BIGINT NOT NULL,
 
     UNIQUE (_loaded_file_id, _source_row_number)
 );

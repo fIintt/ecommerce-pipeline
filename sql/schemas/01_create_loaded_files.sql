@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS loaded_files (
-    id              BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id              INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     file_hash       TEXT NOT NULL UNIQUE,
     file_name       TEXT NOT NULL,
     row_count       INT,
