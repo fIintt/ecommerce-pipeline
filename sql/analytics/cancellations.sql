@@ -1,7 +1,7 @@
 CREATE OR REPLACE VIEW cancellations AS
     SELECT
         invoice_no,
-        DATE(invoice_date)             AS cancel_date,
+        invoice_date::date             AS cancel_date,
         customer_id,
         country,
         stock_code,
