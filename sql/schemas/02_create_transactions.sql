@@ -16,5 +16,3 @@ CREATE TABLE IF NOT EXISTS transactions (
 
 CREATE INDEX IF NOT EXISTS idx_customer_id      ON transactions (customer_id);
 CREATE INDEX IF NOT EXISTS idx_invoice_no       ON transactions (invoice_no);
-CREATE INDEX IF NOT EXISTS idx_invoice_date     ON transactions (invoice_date);
-CREATE INDEX IF NOT EXISTS idx_stock_code       ON transactions (stock_code);
