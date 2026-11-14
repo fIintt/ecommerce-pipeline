@@ -11,10 +11,9 @@ def load_rejected_data(
     if not rows.height:
         return 0
 
-    dir = path / file_hash[:12]
-    dir.mkdir(parents=True, exist_ok=True)
-
-    path = dir / f"rejected.parquet"
+    path.mkdir(parents=True, exist_ok=True)
+    
+    path = path / f"{file_hash[:12]}.parquet"
 
     rows.write_parquet(path)
 

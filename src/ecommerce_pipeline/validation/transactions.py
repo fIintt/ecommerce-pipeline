@@ -20,14 +20,17 @@ _TRANSACTION_INPUT_RULES: dict[str, pl.Expr] = {
     "missing_invoice_no": is_blank("InvoiceNo"),
     "missing_stock_code": is_blank("StockCode"),
     "missing_country": is_blank("Country"),
+    "missing_unit_price": is_blank("UnitPrice"),
+    "missing_quantity": is_blank("Quantity"),
+    "missing_invoice_date": is_blank("InvoiceDate"),
 }
 
 _TRANSACTION_OUTPUT_RULES: dict[str, pl.Expr] = {
     "negative_unit_price": pl.col("unit_price") < 0,
-    "missing_unit_price": pl.col("unit_price").is_null(), # Todo: differentiate the original data has a missing price or an invalid price that failed conversion
-    "missing_quantity": pl.col("quantity").is_null(),
+    "unparseable_unit_price": pl.col("unit_price").is_null(),
     "zero_quantity": pl.col("quantity") == 0,
-    "missing_invoice_date": pl.col("invoice_date").is_null(),
+    "unparseable_quantity": pl.col("quantity").is_null(),
+    "unparseable_invoice_date": pl.col("invoice_date").is_null(),
 }
 
 

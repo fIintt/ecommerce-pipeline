@@ -1,9 +1,9 @@
-from contextlib import contextmanager
 import hashlib
-from pathlib import Path
 import shutil
 import tempfile
-from typing import Generator
+from collections.abc import Generator
+from contextlib import contextmanager
+from pathlib import Path
 
 import polars as pl
 

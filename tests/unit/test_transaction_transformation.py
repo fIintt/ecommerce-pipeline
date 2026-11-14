@@ -3,7 +3,6 @@ from decimal import Decimal
 
 import polars as pl
 
-
 from ecommerce_pipeline.transformation.transactions import (
     transform_transactions,
 )

@@ -2,9 +2,9 @@ import logging
 from typing import get_type_hints
 
 from rich import box
+from rich.console import Console
 from rich.logging import RichHandler
 from rich.table import Table
-from rich.console import Console
 
 from ecommerce_pipeline.pipelines.runner import PipelineResult
 

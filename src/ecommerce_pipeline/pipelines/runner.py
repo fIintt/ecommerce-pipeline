@@ -1,16 +1,16 @@
-from dataclasses import dataclass
 import logging
 import time
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 
 import polars as pl
 import psycopg
 
 from ecommerce_pipeline.config import REJECTED_DIR
-from ecommerce_pipeline.loading.postgres import load_loaded_files
 from ecommerce_pipeline.ingestion.extractor import extract_csv, hash_file
 from ecommerce_pipeline.loading.parquet import load_rejected_data
+from ecommerce_pipeline.loading.postgres import load_loaded_files
 
 
 @dataclass(frozen=True)

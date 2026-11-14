@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import LiteralString, cast
 
-import psycopg
 import polars as pl
+import psycopg
 from psycopg import sql
 
 from ecommerce_pipeline.config import setup_database_settings
@@ -32,14 +32,15 @@ def load_loaded_files(
 ) -> int | None:
     row = conn.execute(
         """
-        INSERT INTO loaded_files
-            (file_hash, file_name, row_count)
+        INSERT INTO 
+            loaded_files (file_hash, file_name, row_count)
         VALUES
             (%s, %s, %s)
         ON CONFLICT
             (file_hash)
         DO NOTHING
-        RETURNING id
+        RETURNING 
+            id
         """,
         (file_hash, file_name, row_count),
     ).fetchone()

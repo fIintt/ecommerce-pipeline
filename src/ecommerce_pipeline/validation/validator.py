@@ -28,7 +28,8 @@ def _apply_rules(
 def validate_input(
     lf: pl.LazyFrame, required_cols: list[str], input_rules: dict[str, pl.Expr]
 ) -> tuple[pl.LazyFrame, pl.LazyFrame]:
-    missing = [col for col in required_cols if col not in lf.collect_schema().names()]
+    cols = set(lf.collect_schema().names())
+    missing = [col for col in required_cols if col not in cols]
 
     if missing:
         raise ValueError(f"Missing required columns: {missing}")

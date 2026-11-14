@@ -47,6 +47,12 @@ OUTPUT_SAMPLE = {
     "country": "United Kingdom",
 }
 
+CSV_CONTENT = (
+    "InvoiceNo,StockCode,Description,Quantity,InvoiceDate,UnitPrice,CustomerID,Country\n"
+    "536365,85123A,WHITE HANGING HEART,6,12/1/2010 8:26,2.55,17850,United Kingdom\n"
+    "536365,71053,WHITE METAL LANTERN,6,12/1/2010 8:26,3.39,17850,United Kingdom\n"
+)
+
 
 def make_input_lf(*samples: dict) -> pl.LazyFrame:
     rows = [{**INPUT_SAMPLE, **sample} for sample in (samples or ({},))]
