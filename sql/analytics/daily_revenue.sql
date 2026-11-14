@@ -10,7 +10,7 @@ CREATE OR REPLACE VIEW daily_revenue AS
     WHERE
         quantity > 0
     GROUP BY
-        invoice_date::date;
+        revenue_date;
 
 COMMENT ON VIEW daily_revenue IS
     'Gross sales per day. Excludes returns.';

@@ -1,6 +1,7 @@
 CREATE OR REPLACE VIEW rfm AS
-    WITH rfm AS (
-        SELECT customer_id,
+    WITH base AS (
+        SELECT 
+            customer_id,
             (SELECT MAX(invoice_date::date) FROM transactions) - MAX(invoice_date::date) AS recency,
             COUNT(DISTINCT invoice_no)                                                   AS frequency,
             SUM(quantity * unit_price)                                                   AS monetary
@@ -8,6 +9,7 @@ CREATE OR REPLACE VIEW rfm AS
             transactions
         WHERE 
             customer_id IS NOT NULL
+            AND quantity > 0
         GROUP BY 
             customer_id
     )
@@ -17,7 +19,7 @@ CREATE OR REPLACE VIEW rfm AS
         NTILE(5) OVER (ORDER BY frequency)    AS f_score,
         NTILE(5) OVER (ORDER BY monetary)     AS m_score
     FROM 
-        rfm;
+        base;
 
 COMMENT ON VIEW rfm IS
-    'Customer RFM (Recency, Frequency, Monetary) metrics and quintile scores (1-5). Excludes null customer_ids.';
+    'Customer RFM quintile scores (1-5). Excludes null customer_ids.';
