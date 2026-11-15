@@ -1,7 +1,6 @@
 import logging
 import time
 from collections.abc import Callable
-from dataclasses import dataclass
 from pathlib import Path
 
 import polars as pl
@@ -10,23 +9,11 @@ import psycopg
 from ecommerce_pipeline.config import REJECTED_DIR
 from ecommerce_pipeline.ingestion.extractor import extract_csv, hash_file
 from ecommerce_pipeline.loading.parquet import load_rejected_data
-from ecommerce_pipeline.loading.postgres import load_loaded_files
-
-
-@dataclass(frozen=True)
-class PipelineResult:  # Summary of a run
-    read: int
-    rejected: int
-    skipped: int
-    loaded: int
-    elapsed: float
-
-
-@dataclass(frozen=True)
-class BatchResult:  # Frames produced by validating and transforming one file.
-    read: int
-    valid: pl.DataFrame
-    rejected: pl.DataFrame
+from ecommerce_pipeline.loading.postgres import (
+    load_loaded_file_summaries,
+    load_loaded_files,
+)
+from ecommerce_pipeline.models import BatchResult, PipelineResult
 
 
 def _process_batch(
@@ -124,32 +111,35 @@ def run_pipeline(
         )
 
         with conn.transaction():
-            load_id = load_loaded_files(conn, file_hash, path.name, batch.valid.height)
+            load_id, file_created = load_loaded_files(conn, file_hash, path.name)
 
-            if load_id is None:
+            if not file_created:
                 loaded = 0
 
             else:
-                loadable = batch.valid.with_columns(
+                ready_batch = batch.valid.with_columns(
                     pl.lit(load_id).alias("_loaded_file_id")
                 )
 
-                loaded = load(conn, loadable)
+                loaded = load(conn, ready_batch)
 
-                if loaded != loadable.height:
+                if loaded != ready_batch.height:
                     raise ValueError(
-                        f"Load mismatch: expected={loadable.height} loaded={loaded}"
+                        f"Load mismatch: expected={ready_batch.height} loaded={loaded}"
                     )
 
-        elapsed = time.perf_counter() - started_at
+            result = PipelineResult(
+                read=batch.read,
+                rejected=batch.rejected.height,
+                skipped=batch.valid.height - loaded,
+                loaded=loaded,
+                elapsed=time.perf_counter() - started_at,
+            )
 
-        return PipelineResult(
-            read=batch.read,
-            rejected=batch.rejected.height,
-            skipped=batch.valid.height - loaded,
-            loaded=loaded,
-            elapsed=elapsed,
-        )
+            if file_created:
+                load_loaded_file_summaries(conn, load_id, result)
+
+        return result
 
     except KeyError, ValueError, TypeError:
         logger.exception("Pipeline encountered an error")

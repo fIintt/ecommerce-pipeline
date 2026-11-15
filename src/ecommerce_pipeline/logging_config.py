@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.logging import RichHandler
 from rich.table import Table
 
-from ecommerce_pipeline.pipelines.runner import PipelineResult
+from ecommerce_pipeline.models import PipelineResult
 
 
 def setup_logging() -> None:

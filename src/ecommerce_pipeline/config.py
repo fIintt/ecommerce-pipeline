@@ -1,28 +1,18 @@
 import os
-from dataclasses import dataclass
 from pathlib import Path
 
 from dotenv import load_dotenv
 
+from ecommerce_pipeline.models import DatabaseSettings
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-BRONZE_DIR = PROJECT_ROOT / "data" / "bronze"
-SILVER_DIR = PROJECT_ROOT / "data" / "silver"
-GOLD_DIR = PROJECT_ROOT / "data" / "gold"
+RAW_DIR = PROJECT_ROOT / "data" / "raw"
 REJECTED_DIR = PROJECT_ROOT / "data" / "rejected"
 
 SCHEMA_DIR = PROJECT_ROOT / "sql" / "schemas"
 VIEW_DIR = PROJECT_ROOT / "sql" / "views"
 ANALYTICS_DIR = PROJECT_ROOT / "sql" / "analytics"
-
-
-@dataclass(frozen=True)
-class DatabaseSettings:
-    user: str
-    password: str
-    host: str
-    port: int
-    name: str
 
 
 def require_env(name: str) -> str:

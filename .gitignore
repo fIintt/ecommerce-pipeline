@@ -10,15 +10,11 @@ wheels/
 .venv
 
 # Data files
-data/bronze/*
-data/silver/*
-data/gold/*
+data/raw/*
 data/rejected/*
 
 # Keep directory placeholders
-!data/bronze/.gitkeep
-!data/silver/.gitkeep
-!data/gold/.gitkeep
+!data/raw/.gitkeep
 !data/rejected/.gitkeep
 
 # Environment variables

@@ -6,6 +6,7 @@ import psycopg
 from psycopg import sql
 
 from ecommerce_pipeline.config import setup_database_settings
+from ecommerce_pipeline.models import PipelineResult
 
 
 def connect_postgres() -> psycopg.Connection:
@@ -28,24 +29,58 @@ def initialize_postgres(conn: psycopg.Connection, path: Path) -> None:
 
 
 def load_loaded_files(
-    conn: psycopg.Connection, file_hash: str, file_name: str, row_count: int
-) -> int | None:
+    conn: psycopg.Connection, file_hash: str, file_name: str
+) -> tuple[int, bool]:
     row = conn.execute(
         """
         INSERT INTO 
-            loaded_files (file_hash, file_name, row_count)
-        VALUES
-            (%s, %s, %s)
-        ON CONFLICT
-            (file_hash)
+            loaded_files (file_hash, file_name)
+        VALUES 
+            (%s, %s)
+        ON CONFLICT 
+            (file_hash) 
         DO NOTHING
         RETURNING 
             id
         """,
-        (file_hash, file_name, row_count),
+        (file_hash, file_name),
     ).fetchone()
 
-    return row[0] if row else None
+    if row:
+        return row[0], True
+
+    row = conn.execute(
+        "SELECT id FROM loaded_files WHERE file_hash = %s", (file_hash,)
+    ).fetchone()
+
+    if row is None:
+        raise RuntimeError(f"loaded_files row unavailable for hash {file_hash}")
+
+    return row[0], False
+
+
+def load_loaded_file_summaries(
+    conn: psycopg.Connection, load_id: int, result: PipelineResult
+) -> None:
+    conn.execute(
+        """
+        INSERT INTO 
+            loaded_file_summaries (loaded_file_id, row_count, rejected_count, skipped_count, loaded_count, elapsed_seconds)
+        VALUES
+            (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT
+            (loaded_file_id)
+        DO NOTHING
+        """,
+        (
+            load_id,
+            result.read,
+            result.rejected,
+            result.skipped,
+            result.loaded,
+            result.elapsed,
+        ),
+    )
 
 
 def load_transactions(conn: psycopg.Connection, rows: pl.DataFrame) -> int:

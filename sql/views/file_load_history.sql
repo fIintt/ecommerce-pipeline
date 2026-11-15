@@ -1,8 +1,12 @@
 CREATE OR REPLACE VIEW file_load_history AS
     SELECT 
-        id,
-        file_name,
-        row_count,
-        TO_CHAR (loaded_at, 'YYYY-MM-DD HH24:MI:SS TZH:TZM') AS loaded_at
+        lf.file_name,
+        lfs.row_count,
+        lfs.rejected_count,
+        lfs.skipped_count,
+        lfs.loaded_count,
+        lfs.elapsed_seconds,
+        TO_CHAR (lf.loaded_at, 'YYYY-MM-DD HH24:MI:SS TZH:TZM') AS loaded_at
     FROM
-        loaded_files;
+        loaded_files AS lf
+        JOIN loaded_file_summaries AS lfs ON lfs.loaded_file_id = lf.id;

@@ -12,7 +12,7 @@ def load_rejected_data(
         return 0
 
     path.mkdir(parents=True, exist_ok=True)
-    
+
     path = path / f"{file_hash[:12]}.parquet"
 
     rows.write_parquet(path)
