@@ -9,8 +9,9 @@ CREATE OR REPLACE VIEW daily_revenue AS
         transactions
     WHERE
         quantity > 0
+        AND _is_product
     GROUP BY
         revenue_date;
 
 COMMENT ON VIEW daily_revenue IS
-    'Gross sales per day. Excludes returns.';
+    'Gross sales per day. Excludes returns and non-product transactions.';

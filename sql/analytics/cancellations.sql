@@ -11,7 +11,8 @@ CREATE OR REPLACE VIEW cancellations AS
     FROM
         transactions
     WHERE 
-        invoice_no LIKE 'C%';
+        invoice_no LIKE 'C%'
+        AND _is_product;
 
 COMMENT ON VIEW cancellations IS
-    'Cancelled/returned invoice lines (C-prefixed invoices) with positive quantity and value. Excludes stock adjustments.';
+    'Cancelled/returned invoice lines (C-prefixed invoices) with positive quantity and value. Excludes non-product transactions.';

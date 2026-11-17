@@ -9,8 +9,9 @@ CREATE OR REPLACE VIEW monthly_revenue AS
         transactions
     WHERE
         quantity > 0
+        AND _is_product
     GROUP BY
         revenue_month;
 
 COMMENT ON VIEW monthly_revenue IS
-    'Gross sales per month. Excludes returns.';
+    'Gross sales per month. Excludes returns and non-product transactions.';

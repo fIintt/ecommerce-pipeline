@@ -77,3 +77,9 @@ def test_row_count_is_unchanged():
     df = run(make_input_lf({}, {"UnitPrice": "-67.76"}, {"Description": None}))
 
     assert df.height == 3
+
+
+def test_corrupted_pound_sign_is_repaired():
+    df = run(make_input_lf({"Description": "Dotcomgiftshop Gift Voucher ï¿½10.00"}))
+
+    assert df["description"][0] == "Dotcomgiftshop Gift Voucher £10.00"

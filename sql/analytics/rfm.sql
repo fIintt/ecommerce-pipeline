@@ -10,6 +10,7 @@ CREATE OR REPLACE VIEW rfm AS
         WHERE 
             customer_id IS NOT NULL
             AND quantity > 0
+            AND _is_product
         GROUP BY 
             customer_id
     )
@@ -22,4 +23,4 @@ CREATE OR REPLACE VIEW rfm AS
         base;
 
 COMMENT ON VIEW rfm IS
-    'Customer RFM quintile scores (1-5). Excludes null customer_ids.';
+    'Customer RFM quintile scores (1-5). Excludes null customer_ids and non_product transactions.';

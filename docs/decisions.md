@@ -143,3 +143,8 @@ Indexes help queries that select a small part of the table (Q1, Q2, Q4) and do n
 - Records with negative quantities and without "C" in `invoice_no` are damaged/lost/unsure, etc.
 - 541,909 rows were read and 541,907 loaded; 2 rows were rejected by validation. TODO: say why.
 - TODO: say whether cancellations are excluded from revenue or kept as negatives.
+
+
+## Pound signs
+- The source dataset uses `�` as a corrupted representation of the British pound sign (`£`).
+- All occurrences of `�` in the relevant monetary fields are assumed to represent `£` and can therefore be safely replaced.
