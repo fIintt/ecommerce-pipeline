@@ -68,9 +68,6 @@ def load_loaded_file_summaries(
             loaded_file_summaries (loaded_file_id, row_count, rejected_count, skipped_count, loaded_count, elapsed_seconds)
         VALUES
             (%s, %s, %s, %s, %s, %s)
-        ON CONFLICT
-            (loaded_file_id)
-        DO NOTHING
         """,
         (
             load_id,

@@ -136,8 +136,7 @@ def run_pipeline(
                 elapsed=time.perf_counter() - started_at,
             )
 
-            if file_created:
-                load_loaded_file_summaries(conn, load_id, result)
+            load_loaded_file_summaries(conn, load_id, result)
 
         return result
 
