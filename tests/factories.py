@@ -47,7 +47,6 @@ OUTPUT_SAMPLE = {
     "country": "United Kingdom",
 }
 
-
 HEADER = "InvoiceNo,StockCode,Description,Quantity,InvoiceDate,UnitPrice,CustomerID,Country\n"
 
 ROWS = (

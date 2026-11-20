@@ -1,7 +1,7 @@
 [project]
 name = "ecommerce-pipeline"
 version = "0.1.0"
-description = "Add your description here"
+description = "ETL pipeline that cleans e-commerce transaction CSV and loads them into PostgreSQL"
 readme = "README.md"
 authors = [
     { name = "flint", email = "kiddolol39@gmail.com" }
@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-ecommerce-pipeline = "ecommerce_pipeline:main"
+pipeline = "ecommerce_pipeline.main:main"
 
 [build-system]
 requires = ["uv_build>=0.12.3,<0.13.0"]
@@ -34,3 +34,4 @@ dev = [
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+testpaths = ["tests"]

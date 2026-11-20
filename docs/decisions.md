@@ -144,7 +144,39 @@ Indexes help queries that select a small part of the table (Q1, Q2, Q4) and do n
 - 541,909 rows were read and 541,907 loaded; 2 rows were rejected by validation. TODO: say why.
 - TODO: say whether cancellations are excluded from revenue or kept as negatives.
 
-
 ## Pound signs
+
 - The source dataset uses `�` as a corrupted representation of the British pound sign (`£`).
 - All occurrences of `�` in the relevant monetary fields are assumed to represent `£` and can therefore be safely replaced.
+- In the CSV byte sequence, the corruption is `EF BF BD`; the transform repairs it to `£`.
+
+## File-hash idempotency
+
+**Decision:** A file is skipped when the SHA-256 file hash already exists in `loaded_files`.
+
+**Limit:** The hash only represents the input file. A changed transform, validation rule, or schema does not reload already recorded files. To rerun old files after a logic change, clear the target tables and reset `loaded_files` or recreate the database volumes, then rerun the file.
+
+## Rejects
+
+Rejected rows are written to Parquet under `data/rejected/transactions/`, not inserted into PostgreSQL. Their `_reject_reason` and `_source_row_number` preserve validation and lineage information.
+
+## Product and sale line classification
+
+A sale line has a 5-digit catalog code and `unit_price > 0`:
+
+```sql
+stock_code ~ '^[0-9]{5}' AND unit_price > 0
+```
+
+Zero-price catalog-code lines are excluded from sales: with no customer they are stock adjustments, while with a customer they are free items. `M` and other manual/non-product stock codes are not products even though they can carry a price. Revenue, cancellation, and RFM views filter on `_is_product`.
+
+Descriptions retain their original case. Whitespace around a description may be cleaned, but capitalization is not normalized.
+
+## Schema changes
+
+The schema SQL uses `CREATE TABLE IF NOT EXISTS` and `CREATE INDEX IF NOT EXISTS`; view SQL uses `CREATE OR REPLACE VIEW`. Existing tables are not automatically recreated or altered. To test a schema change from a clean state, run:
+
+```bash
+docker compose down -v
+docker compose up -d --wait
+```

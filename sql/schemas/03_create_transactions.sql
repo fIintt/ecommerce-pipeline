@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     invoice_date        TIMESTAMP NOT NULL,
     unit_price          NUMERIC(12,4) NOT NULL CHECK (unit_price >= 0),
     customer_id         BIGINT,
-    country             TEXT,
+    country             TEXT NOT NULL,
     _loaded_file_id     INT NOT NULL REFERENCES loaded_files(id) ON DELETE RESTRICT,
     _source_row_number  BIGINT NOT NULL,
     _is_product         BOOLEAN GENERATED ALWAYS AS (stock_code ~ '^[0-9]{5}' AND unit_price > 0) STORED, -- STORED calculates the value when the row is written (the alternative is VIRTUAL)
