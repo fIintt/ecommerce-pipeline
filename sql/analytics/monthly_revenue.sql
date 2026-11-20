@@ -14,4 +14,4 @@ CREATE OR REPLACE VIEW monthly_revenue AS
         revenue_month;
 
 COMMENT ON VIEW monthly_revenue IS
-    'Gross sales per month. Excludes returns and non-product transactions.';
+    'Gross sales per month. Excludes returns, non-product lines, stock adjustments and free items.';

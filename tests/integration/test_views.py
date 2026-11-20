@@ -98,15 +98,26 @@ def test_rfm(loaded):
     assert {scores[13047][1], scores[12583][1]} == {1, 2}
 
 
-def test_non_product_lines(loaded):
+def test_non_product_summary(loaded):
     rows = loaded.execute(
-        "SELECT invoice_no, stock_code, quantity, unit_price, customer_id, country "
-        "FROM transactions WHERE NOT _is_product "
-        "ORDER BY _source_row_number"
+        "SELECT stock_code, typical_description, line_count, net_value "
+        "FROM non_product_summary ORDER BY stock_code"
     ).fetchall()
 
     assert rows == [
-        ("536371", "POST", 1, Decimal("15.00"), 17850, "United Kingdom"),
-        ("536372", "M", 1, Decimal("99.99"), 99999, "Germany"),
-        ("C536380", "D", -1, Decimal("5.00"), 13047, "France"),
+        ("D", "Discount", 1, Decimal("-5.00")),
+        ("M", "Manual", 1, Decimal("99.99")),
+        ("POST", "POSTAGE", 1, Decimal("15.00")),
+    ]
+
+
+def test_stock_adjustments(loaded):
+    rows = loaded.execute(
+        "SELECT reason, count, units_added, units_removed "
+        "FROM stock_adjustments ORDER BY reason"
+    ).fetchall()
+
+    assert rows == [
+        ("ADJUSTMENT", 1, 3, 0),
+        ("REVERSE ADJUSTMENT", 1, 0, -100),
     ]

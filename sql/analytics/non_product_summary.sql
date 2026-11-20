@@ -7,9 +7,9 @@ CREATE OR REPLACE VIEW non_product_summary AS
     FROM
         transactions
     WHERE
-        NOT _is_product
+        stock_code !~ '^[0-9]{5}'
     GROUP BY
         UPPER(stock_code);
 
 COMMENT ON VIEW non_product_summary IS
-    'Non-product transactions.';
+    'Lines whose stock code is not a catalog code (postage, fees, discounts, manual entries, samples), per stock code: line count and net value.';

@@ -18,7 +18,7 @@ def transform_transactions(lf: pl.LazyFrame) -> pl.LazyFrame:
         .with_columns(
             pl.col("description").str.replace_all(
                 "\u00ef\u00bf\u00bd", "\u00a3", literal=True
-            )  # Handles corrupted £ (decodes as "ï¿½" under cp1252)
+            )
         )
         .with_columns(pl.col(pl.String).str.replace_all(r"\s+", " ").str.strip_chars())
         .with_columns(

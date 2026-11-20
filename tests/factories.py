@@ -47,10 +47,28 @@ OUTPUT_SAMPLE = {
     "country": "United Kingdom",
 }
 
-CSV_CONTENT = (
-    "InvoiceNo,StockCode,Description,Quantity,InvoiceDate,UnitPrice,CustomerID,Country\n"
+
+HEADER = "InvoiceNo,StockCode,Description,Quantity,InvoiceDate,UnitPrice,CustomerID,Country\n"
+
+ROWS = (
+    # Product lines
     "536365,85123A,WHITE HANGING HEART,6,12/1/2010 8:26,2.55,17850,United Kingdom\n"
     "536365,71053,WHITE METAL LANTERN,6,12/1/2010 8:26,3.39,17850,United Kingdom\n"
+    "536366,22633,HAND WARMER,2,12/1/2010 8:28,1.85,13047,France\n"
+    "536367,84406B,CREAM CUPID HEARTS,3,12/1/2010 8:34,4.00,,United Kingdom\n"
+    "536370,22728,ALARM CLOCK BAKELIKE,4,12/2/2010 9:00,2.50,17850,United Kingdom\n"
+    "C536379,22423,REGENCY CAKESTAND 3 TIER,-1,12/2/2010 9:41,10.00,13047,France\n"
+    "537000,22086,PAPER CHAIN KIT,5,1/5/2011 10:00,3.00,12583,France\n"
+    # Non-product lines
+    "536371,POST,POSTAGE,1,12/1/2010 9:00,15.00,17850,United Kingdom\n"
+    "536372,M,Manual,1,12/1/2010 9:30,99.99,99999,Germany\n"
+    "C536380,D,Discount,-1,12/2/2010 10:00,5.00,13047,France\n"
+    # Bad rows
+    "C536379,22423,REGENCY CAKESTAND 3 TIER,-1,12/2/2010 9:41,-6767.00,13047,France\n"
+    "537000,22086,PAPER CHAIN KIT,5,1/5/2011 10:00,12abc.00,12583,France\n"
+    # Stock adjustments
+    "536373,21319,adjustment,3,12/1/2010 9:45,0,,United Kingdom\n"
+    "536374,22501,reverse adjustment,-100,12/2/2010 10:30,0,,United Kingdom\n"
 )
 
 

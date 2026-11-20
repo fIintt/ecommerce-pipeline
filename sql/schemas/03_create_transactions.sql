@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     country             TEXT,
     _loaded_file_id     INT NOT NULL REFERENCES loaded_files(id) ON DELETE RESTRICT,
     _source_row_number  BIGINT NOT NULL,
-    _is_product         BOOLEAN GENERATED ALWAYS AS (stock_code ~ '^[0-9]{5}') STORED, -- STORED calculates the value when the row is written (the alternative is VIRTUAL)
+    _is_product         BOOLEAN GENERATED ALWAYS AS (stock_code ~ '^[0-9]{5}' AND unit_price > 0) STORED, -- STORED calculates the value when the row is written (the alternative is VIRTUAL)
 
     UNIQUE (_loaded_file_id, _source_row_number)
 );

@@ -3,7 +3,13 @@ import argparse
 import logging
 from pathlib import Path
 
-from ecommerce_pipeline.config import ANALYTICS_DIR, RAW_DIR, SCHEMA_DIR, VIEW_DIR
+from ecommerce_pipeline.config import (
+    ANALYTICS_DIR,
+    RAW_DIR,
+    REJECTED_DIR,
+    SCHEMA_DIR,
+    VIEW_DIR,
+)
 from ecommerce_pipeline.loading.postgres import connect_postgres, initialize_postgres
 from ecommerce_pipeline.logging_config import log_summary, setup_logging
 from ecommerce_pipeline.models import PipelineResult
@@ -18,7 +24,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--path",
         type=Path,
         default=RAW_DIR / "transactions.csv",
-        help="Raw transactions CSV, cp1252-encoded (default: %(default)s)",
+        help="Raw transactions CSV (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--rejected-path",
+        type=Path,
+        default=REJECTED_DIR,
+        help="Where rejected rows are written as Parquet (default: %(default)s)",
     )
     return parser.parse_args(argv)
 
@@ -40,7 +52,9 @@ def main(argv: list[str] | None = None) -> None:
         initialize_postgres(conn, VIEW_DIR)
         initialize_postgres(conn, ANALYTICS_DIR)
 
-        summary["transactions"] = run_transaction_pipeline(conn, args.path)
+        summary["transactions"] = run_transaction_pipeline(
+            conn, path=args.path, rejected_path=args.rejected_path / "transactions"
+        )
 
     log_summary(summary)
 

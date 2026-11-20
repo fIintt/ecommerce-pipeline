@@ -27,7 +27,7 @@ CREATE OR REPLACE VIEW revenue_by_country AS
     
     
 COMMENT ON VIEW revenue_by_country IS
-    'Gross sales per country. Excludes returns and non_product transactions.';
+    'Gross sales per country. Excludes returns, non-product lines, stock adjustments and free items.';
 
 COMMENT ON COLUMN revenue_by_country.customer_count IS
     'Anonymous customers are not counted.';

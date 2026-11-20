@@ -14,4 +14,4 @@ CREATE OR REPLACE VIEW daily_revenue AS
         revenue_date;
 
 COMMENT ON VIEW daily_revenue IS
-    'Gross sales per day. Excludes returns and non-product transactions.';
+    'Gross sales per day. Excludes returns, non-product lines, stock adjustments and free items.';

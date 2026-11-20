@@ -23,4 +23,4 @@ CREATE OR REPLACE VIEW rfm AS
         base;
 
 COMMENT ON VIEW rfm IS
-    'Customer RFM quintile scores (1-5). Excludes null customer_ids and non_product transactions.';
+    'Customer RFM quintile scores (1-5). Excludes null customer_ids, returns, non-product lines, stock adjustments and free items.';

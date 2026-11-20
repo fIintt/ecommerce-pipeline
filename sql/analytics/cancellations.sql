@@ -15,4 +15,4 @@ CREATE OR REPLACE VIEW cancellations AS
         AND _is_product;
 
 COMMENT ON VIEW cancellations IS
-    'Cancelled/returned invoice lines (C-prefixed invoices) with positive quantity and value. Excludes non-product transactions.';
+    'Cancelled/returned invoice lines (C-prefixed invoices) with positive quantity and value. Excludes non-product lines, stock adjustments and free items.';

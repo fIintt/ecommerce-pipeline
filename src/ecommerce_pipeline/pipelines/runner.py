@@ -6,7 +6,6 @@ from pathlib import Path
 import polars as pl
 import psycopg
 
-from ecommerce_pipeline.config import REJECTED_DIR
 from ecommerce_pipeline.ingestion.extractor import extract_csv, hash_file
 from ecommerce_pipeline.loading.parquet import load_rejected_data
 from ecommerce_pipeline.loading.postgres import (
@@ -65,10 +64,10 @@ def _check_reconciliation(batch: BatchResult) -> None:
 def _process_rejected_data(
     *,
     rejected: pl.DataFrame,
-    pipeline_name: str,
+    rejected_path: Path,
     file_hash: str,
 ) -> None:
-    processed = load_rejected_data(rejected, REJECTED_DIR / pipeline_name, file_hash)
+    processed = load_rejected_data(rejected, rejected_path, file_hash)
 
     if processed != rejected.height:
         raise ValueError(
@@ -82,6 +81,7 @@ def run_pipeline(
     name: str,
     conn: psycopg.Connection,
     path: Path,
+    rejected_path: Path,
     validate_input: Callable[[pl.LazyFrame], tuple[pl.LazyFrame, pl.LazyFrame]],
     transform: Callable[[pl.LazyFrame], pl.LazyFrame],
     validate_output: Callable[[pl.LazyFrame], tuple[pl.LazyFrame, pl.LazyFrame]],
@@ -106,7 +106,7 @@ def run_pipeline(
 
         _process_rejected_data(
             rejected=batch.rejected,
-            pipeline_name=name,
+            rejected_path=rejected_path,
             file_hash=file_hash,
         )
 
