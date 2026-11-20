@@ -1,6 +1,6 @@
-# ecommerce-pipeline
+# Ecommerce pipeline
 
-[![CI](https://github.com/flint/ecommerce-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/flint/ecommerce-pipeline/actions/workflows/ci.yml)
+[![CI](https://github.com/fIintt/ecommerce-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/fIintt/ecommerce-pipeline/actions/workflows/ci.yml)
 
 A local Python ETL pipeline that reads e-commerce transaction CSV files, validates and transforms rows with Polars, writes rejected rows to Parquet, and loads accepted rows into PostgreSQL. It is designed for one input file at a time and is validated with unit and integration tests.
 
