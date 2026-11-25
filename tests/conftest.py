@@ -32,7 +32,8 @@ def schema(_test_env):
     with connect_postgres() as conn:
         dbname = conn.info.dbname
 
-        assert "test" in dbname, f"refusing to run against {dbname!r}"
+        if not dbname.endswith("_test"):
+            raise RuntimeError(f"refusing to run against non-test database {dbname!r}")
 
         conn.execute("DROP SCHEMA public CASCADE")
         conn.execute("CREATE SCHEMA public")

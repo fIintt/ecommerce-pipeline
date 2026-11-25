@@ -1,6 +1,7 @@
 import polars as pl
 import pytest
 
+from ecommerce_pipeline.config import PROJECT_ROOT
 from ecommerce_pipeline.main import main
 from ecommerce_pipeline.pipelines.transactions import run_transaction_pipeline
 from tests.factories import HEADER, ROWS
@@ -32,3 +33,18 @@ def test_rejects_are_saved(conn, tmp_path):
 
     assert len(files) == 1
     assert pl.read_parquet(files[0]).height == result.rejected
+
+
+def test_sample_pipeline_matches_documented_summary(conn, tmp_path):
+    sample = PROJECT_ROOT / "data" / "sample" / "sample.csv"
+
+    result = run_transaction_pipeline(
+        conn, path=sample, rejected_path=tmp_path / "rejected" / "transactions"
+    )
+
+    assert (result.read, result.rejected, result.skipped, result.loaded) == (
+        49,
+        8,
+        0,
+        41,
+    )

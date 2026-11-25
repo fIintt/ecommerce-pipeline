@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/fIintt/ecommerce-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/fIintt/ecommerce-pipeline/actions/workflows/ci.yml)
 
-A local Python ETL pipeline that reads e-commerce transaction CSV files, validates and transforms rows with Polars, writes rejected rows to Parquet, and loads accepted rows into PostgreSQL. It is designed for one input file at a time and is validated with unit and integration tests.
+A local ETL pipeline for turning e-commerce transaction CSV exports into validated, queryable PostgreSQL tables. It transforms data with Polars, writes rejected rows to Parquet, and exposes sales and customer-analysis views. The goal is a small, reproducible pipeline with row-level lineage and file-hash idempotency, not a production-scale distributed platform.
 
 ```mermaid
 flowchart LR
@@ -15,19 +15,39 @@ flowchart LR
     PostgreSQL --> Views[Revenue and analysis views]
 ```
 
+## Stack and requirements
+
+- Python 3.14+
+- uv for environment and dependency management
+- Polars for CSV transformation and validation
+- psycopg 3 and PostgreSQL 18 for loading and analytics
+- pytest, Ruff, and Pyright for tests and code quality
+- Docker Compose v2 to run PostgreSQL locally
+
+## Project layout
+
+- `src/ecommerce_pipeline/`: ingestion, transformation, validation, loading, and pipeline orchestration
+- `sql/`: database schemas and analytical views
+- `tests/`: unit tests and PostgreSQL integration tests
+- `data/sample/`: small synthetic CSV fixture; raw and rejected data are kept out of Git
+- `docker/initdb/`: PostgreSQL initialization, including creation of the test database
+- `docs/decisions.md`: technical decisions, trade-offs, and known limits
+
 ## Sample data
 
-`transactions_sample.csv` is a small, synthetic stand-in for the real transactions file. It lets you run the whole pipeline in seconds without downloading the full dataset, and it contains at least one example of every situation the pipeline handles: good rows, returns, non-product lines, stock adjustments, and rows that must be rejected.
+`sample.csv` is a small, synthetic stand-in for the real transactions file. It lets you run the whole pipeline in seconds without downloading the full dataset, and it contains at least one example of every situation the pipeline handles: good rows, returns, non-product lines, stock adjustments, and rows that must be rejected.
 
 > **Synthetic data.** It is modelled on this [E-Commerce Data](https://www.kaggle.com/datasets/carrie1/ecommerce-data)
 
 ## Quickstart
 
+Install Python 3.14, uv, and Docker with the Compose v2 plugin first. The example database credentials are for local development only.
+
 ```bash
 cp .env.example .env
 docker compose up -d --wait
 uv sync
-uv run pipeline --path data/sample/transactions_sample.csv
+uv run pipeline --path data/sample/sample.csv
 ```
 
 On Windows PowerShell, the `cp` command is available and the forward-slash path is accepted. The sample run prints a summary with `49` read, `8` rejected, `0` skipped, and `41` loaded on a fresh database.
@@ -157,16 +177,23 @@ uv run pytest
 
 - Unit tests cover CSV extraction, Polars transformations, and validation rules.
 - Integration tests cover PostgreSQL loading, idempotency, the CLI entry point, and views.
-- Integration tests use `DB_NAME_TEST`, reset the public schema, and reject any connection whose database name does not contain `test`.
+- Integration tests use `DB_NAME_TEST`, reset the public schema, and refuse to run unless its database name ends in `_test`.
 
 The test suite writes temporary rejected files and does not modify `data/rejected/`.
 
+## Failure handling
+
+- Invalid rows are rejected by input or output validation, saved to Parquet with their stage and reason, and excluded from the database load.
+- A missing source file, missing required columns, or PostgreSQL error stops the run. Database errors are logged and raised to the caller.
+- The accepted transactions, `loaded_files` record, and run summary commit together. A database failure rolls that transaction back; the rejected Parquet file is written before the database transaction.
+- There is no automatic retry. Resolve a transient database issue and rerun the command; file-hash idempotency applies after a successful commit.
+
 ## Real dataset
 
-The full source file belongs at `data/raw/transactions.csv`. It is expected to use **cp1252** encoding and can be run with:
+The source dataset is downloaded as `data.csv` from [E-Commerce Data](https://www.kaggle.com/datasets/carrie1/ecommerce-data) and is expected to use **cp1252** encoding. Put it at `data/raw/data.csv`, then run the pipeline with its default input path:
 
 ```bash
-uv run pipeline --path data/raw/transactions.csv
+uv run pipeline
 ```
 
 The raw file is intentionally not committed to this repository.

@@ -139,10 +139,9 @@ Indexes help queries that select a small part of the table (Q1, Q2, Q4) and do n
 
 ## Notes
 
-- Records with negative quantities and "C" in `invoice_no` are cancellations.
-- Records with negative quantities and without "C" in `invoice_no` are damaged/lost/unsure, etc.
-- 541,909 rows were read and 541,907 loaded; 2 rows were rejected by validation. TODO: say why.
-- TODO: say whether cancellations are excluded from revenue or kept as negatives.
+- In the real source file, 541,909 rows were read; 541,907 loaded and 2 were rejected as `negative_unit_price` during output validation.
+- Negative-quantity product rows with a `C`-prefixed invoice are represented in `cancellations`. Revenue views filter to `quantity > 0`, so returns are excluded from gross revenue rather than netted as negative sales.
+- Negative-quantity rows without a `C`-prefixed invoice remain in `transactions` and are not counted as sales by the revenue views.
 
 ## Pound signs
 

@@ -23,7 +23,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--path",
         type=Path,
-        default=RAW_DIR / "transactions.csv",
+        default=RAW_DIR / "data.csv",
         help="Raw transactions CSV (default: %(default)s)",
     )
     parser.add_argument(
