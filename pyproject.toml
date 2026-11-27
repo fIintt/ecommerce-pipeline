@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "ETL pipeline that cleans e-commerce transaction CSV and loads them into PostgreSQL"
 readme = "README.md"
 authors = [
-    { name = "flint", email = "kiddolol39@gmail.com" }
+    { name = "flint", email = "222283026+fIintt@users.noreply.github.com" }
 ]
 requires-python = ">=3.14"
 dependencies = [

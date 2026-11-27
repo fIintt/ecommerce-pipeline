@@ -41,7 +41,7 @@ flowchart LR
 
 ## Quickstart
 
-Install Python 3.14, uv, and Docker with the Compose v2 plugin first. The example database credentials are for local development only.
+Install Python 3.14, uv, and Docker with the Compose v2 plugin first. The example database credentials are for local development only. The sample config uses host port `5433` (mapped to PostgreSQL's container port `5432`) to avoid conflicting with a PostgreSQL server already using the usual host port. If `5433` is also occupied, change `DB_PORT` in `.env` to an available port; the pipeline uses that same setting to connect.
 
 ```bash
 cp .env.example .env
