@@ -1,6 +1,6 @@
 [project]
 name = "ecommerce-pipeline"
-version = "0.1.0"
+version = "1.0.0"
 description = "ETL pipeline that cleans e-commerce transaction CSV and loads them into PostgreSQL"
 readme = "README.md"
 authors = [
